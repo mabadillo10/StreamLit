@@ -72,7 +72,7 @@ def main():
             lookback_button = st.button('Confirm' , key='lookback_button')
             
             if lookback_button:
-                num_days = st.number_input('Enter the number of day/s to forecast:', min_value=1, max_value=10000, value=0, step=1) # Number of previous days to use for prediction
+                num_days = st.number_input('Enter the number of day/s to forecast:', min_value=1, max_value=10000, value=0, step=1) # Number of previous days to use for predictio
                 if num_days > 0:
             # Wait for user to input forecast lookback
                     numdays_button = st.button('Forecast', 'numdays_button')
