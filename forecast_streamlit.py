@@ -20,21 +20,21 @@ def preprocess_data(df):
     lookback = st.number_input('Enter the number lookback hours to forecast:', min_value=1, max_value=10000, value=1, step=1) # Number of previous hours to use for prediction
     if lookback > 0:
             # Wait for user to input forecast lookback
-        while st.button('Confirm') == False:
-            pass    
-    X = []
-    y = []
-    for i in range(lookback, len(scaled_data)):
-        X.append(scaled_data[i-lookback:i])
-        y.append(scaled_data[i])
+        lookback_button = st.button('Confirm' , key='lookback_button')
+        if lookback_button:
+            X = []
+            y = []
+            for i in range(lookback, len(scaled_data)):
+                X.append(scaled_data[i-lookback:i])
+                y.append(scaled_data[i])
 
-    X = np.array(X)
-    y = np.array(y)
+            X = np.array(X)
+            y = np.array(y)
 
-    # Reshape X for LSTM input shape (samples, time steps, features)
-    X = np.reshape(X, (X.shape[0], X.shape[1], 1))
+            # Reshape X for LSTM input shape (samples, time steps, features)
+            X = np.reshape(X, (X.shape[0], X.shape[1], 1))
 
-    return X, y, scaler
+            return X, y, scaler
 
 # Function to build and train the LSTM model
 def build_model(X, y):
@@ -52,16 +52,16 @@ def forecast_data(model, last_x, scaler):
     num_days = st.number_input('Enter the number of day/s to forecast:', min_value=1, max_value=10000, value=0, step=1) # Number of previous days to use for prediction
     if num_days > 0:
             # Wait for user to input forecast lookback
-        while st.button('Forecast') == False:
-             pass
-    for i in range(num_days*24):
-        prediction = model.predict(np.array([last_x]))
-        future_data.append(prediction[0])
-        last_x = np.concatenate((last_x[1:], prediction), axis=0)
+        numdays_button = st.button('Forecast', 'numdays_button):
+        if numdays_button:
+            for i in range(num_days*24):
+                prediction = model.predict(np.array([last_x]))
+                future_data.append(prediction[0])
+                last_x = np.concatenate((last_x[1:], prediction), axis=0)
 
-    future_data = np.array(future_data)
-    future_data = scaler.inverse_transform(future_data)
-    return future_data
+            future_data = np.array(future_data)
+            future_data = scaler.inverse_transform(future_data)
+            return future_data
 
 # Streamlit app
 def main():
