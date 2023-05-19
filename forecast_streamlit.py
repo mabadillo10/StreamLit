@@ -7,7 +7,7 @@ from tensorflow.keras.layers import LSTM, Dense
 import plotly.graph_objects as go
 
 # Function to preprocess the data
-def preprocess_data(df , lookback):
+def preprocess_data(df):
     # Convert to hourly interval
     df_hourly = df.resample('1H').mean().interpolate()
 
@@ -17,18 +17,18 @@ def preprocess_data(df , lookback):
 
     # Prepare the data for LSTM model
     # User input for forecasting steps
-    
+   
 
     X = []
     y = []
     for i in range(lookback, len(scaled_data)):
-           X.append(scaled_data[i-lookback:i])
-           y.append(scaled_data[i])
+        X.append(scaled_data[i-lookback:i])
+        y.append(scaled_data[i])
 
     X = np.array(X)
     y = np.array(y)
 
-            # Reshape X for LSTM input shape (samples, time steps, features)
+    # Reshape X for LSTM input shape (samples, time steps, features)
     X = np.reshape(X, (X.shape[0], X.shape[1], 1))
 
     return X, y, scaler
@@ -44,16 +44,20 @@ def build_model(X, y):
     return model
 
 # Function to forecast data
-def forecast_data(model, last_x, scaler , num_days):
+def forecast_data(model, last_x, scaler):
     future_data = []
-    
-    for i in range(num_days*24):
-         prediction = model.predict(np.array([last_x]))
-         future_data.append(prediction[0])
-         last_x = np.concatenate((last_x[1:], prediction), axis=0)
+    num_days = st.number_input('Enter the number of day/s to forecast:', min_value=0, max_value=31, value=0, step=1) # Number of previous days to use for prediction
+    if num_days > 0:
+            # Wait for user to input forecast lookback
+        while st.button('Forecast') == False:
+             pass
+    for i in range(numdays*24):
+        prediction = model.predict(np.array([last_x]))
+        future_data.append(prediction[0])
+        last_x = np.concatenate((last_x[1:], prediction), axis=0)
 
-         future_data = np.array(future_data)
-         future_data = scaler.inverse_transform(future_data)
+    future_data = np.array(future_data)
+    future_data = scaler.inverse_transform(future_data)
     return future_data
 
 # Streamlit app
@@ -66,34 +70,28 @@ def main():
         df = pd.read_csv(uploaded_file)
         df['time_interval'] = pd.to_datetime(df['time_interval'])
         df.set_index('time_interval', inplace=True)
-        num_days = st.number_input('Enter the number of day/s to forecast:', min_value=1, max_value=10000, value=0, step=1) # Number of previous days to use for predictio
-        lookback = st.number_input('Enter the number lookback hours to forecast:', min_value=1, max_value=10000, value=0, step=1) # Number of previous hours to use for prediction
-        if lookback  > 0 and numdays > 0:
-            # Wait for user to input forecast lookback
-            forecast_button = st.button('Confirm' , key='forecast_button')
-            if forecast_button:
-            
-                X, y, scaler = preprocess_data(df)
-                model = build_model(X, y)
 
-                # Forecast data for 1 day
-                last_x = X[-1]
-                future_data = forecast_data(model, last_x, scaler)
-                forecast_timestamps = pd.date_range(start=df.index[-1], periods=len(future_data) + 1, freq='H')[1:]
+        X, y, scaler = preprocess_data(df)
+        model = build_model(X, y)
 
-                # Create DataFrame for forecasted data
-                forecast_df = pd.DataFrame({'Delivery Interval': forecast_timestamps, 'Forecasted Value': future_data[:, 0]})
-                forecast_df.set_index('Delivery Interval', inplace=True)
+        # Forecast data for 1 day
+        last_x = X[-1]
+        future_data = forecast_data(model, last_x, scaler)
+        forecast_timestamps = pd.date_range(start=df.index[-1], periods=len(future_data) + 1, freq='H')[1:]
+        
+        # Create DataFrame for forecasted data
+        forecast_df = pd.DataFrame({'Delivery Interval': forecast_timestamps, 'Forecasted Value': future_data[:, 0]})
+        forecast_df.set_index('Delivery Interval', inplace=True)
 
-                # Display forecasted data
-                st.subheader('Forecasted Data')
-                st.write(forecast_df)
+        # Display forecasted data
+        st.subheader('Forecasted Data')
+        st.write(forecast_df)
 
-                # Plot forecasted data
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(x=forecast_timestamps, y=future_data[:, 0], name='Forecasted Data'))
-                fig.update_layout(title='1-Day Forecast using LSTM', xaxis_title='Delivery Interval', yaxis_title='Average LMP')
-                st.plotly_chart(fig)
+        # Plot forecasted data
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=forecast_timestamps, y=future_data[:, 0], name='Forecasted Data'))
+        fig.update_layout(title='1-Day Forecast using LSTM', xaxis_title='Delivery Interval', yaxis_title='Average LMP')
+        st.plotly_chart(fig)
 
 if __name__ == '__main__':
     main()
