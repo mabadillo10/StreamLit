@@ -54,7 +54,7 @@ def forecast_data(model, last_x, scaler):
             # Wait for user to input forecast lookback
         while st.button('Forecast') == False:
              pass
-    for i in range(numdays*24):
+    for i in range(num_days*24):
         prediction = model.predict(np.array([last_x]))
         future_data.append(prediction[0])
         last_x = np.concatenate((last_x[1:], prediction), axis=0)
