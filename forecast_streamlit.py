@@ -67,30 +67,30 @@ def main():
         df.set_index('time_interval', inplace=True)
         num_days = st.number_input('Enter the number of day/s to forecast:', min_value=0, max_value=31, value=0, step=1) # Number of previous days to use for prediction
         if num_days > 0:
-            # Wait for user to input forecast lookback
-            while st.button('Forecast') == False:
-                 pass
-        X, y, scaler = preprocess_data(df)
-        model = build_model(X, y)
+            num_days =  st.button('Forecast',key='num_days')
+            if num_days:
 
-        # Forecast data for 1 day
-        last_x = X[-1]
-        future_data = forecast_data(model, last_x, scaler)
-        forecast_timestamps = pd.date_range(start=df.index[-1], periods=len(future_data) + 1, freq='H')[1:]
-        
-        # Create DataFrame for forecasted data
-        forecast_df = pd.DataFrame({'Delivery Interval': forecast_timestamps, 'Forecasted Value': future_data[:, 0]})
-        forecast_df.set_index('Delivery Interval', inplace=True)
+                X, y, scaler = preprocess_data(df)
+                model = build_model(X, y)
 
-        # Display forecasted data
-        st.subheader('Forecasted Data')
-        st.write(forecast_df)
+                # Forecast data for 1 day
+                last_x = X[-1]
+                future_data = forecast_data(model, last_x, scaler)
+                forecast_timestamps = pd.date_range(start=df.index[-1], periods=len(future_data) + 1, freq='H')[1:]
 
-        # Plot forecasted data
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=forecast_timestamps, y=future_data[:, 0], name='Forecasted Data'))
-        fig.update_layout(title='1-Day Forecast using LSTM', xaxis_title='Delivery Interval', yaxis_title='Average LMP')
-        st.plotly_chart(fig)
+                # Create DataFrame for forecasted data
+                forecast_df = pd.DataFrame({'Delivery Interval': forecast_timestamps, 'Forecasted Value': future_data[:, 0]})
+                forecast_df.set_index('Delivery Interval', inplace=True)
+
+                # Display forecasted data
+                st.subheader('Forecasted Data')
+                st.write(forecast_df)
+
+                # Plot forecasted data
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=forecast_timestamps, y=future_data[:, 0], name='Forecasted Data'))
+                fig.update_layout(title='1-Day Forecast using LSTM', xaxis_title='Delivery Interval', yaxis_title='Average LMP')
+                st.plotly_chart(fig)
 
 if __name__ == '__main__':
     main()
