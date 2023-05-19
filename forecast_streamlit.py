@@ -46,18 +46,11 @@ def build_model(X, y):
 # Function to forecast data
 def forecast_data(model, last_x, scaler):
     future_data = []
-    num_days = st.number_input('Enter the number of day/s to forecast:', min_value=0, max_value=31, value=0, step=1) # Number of previous days to use for prediction
-    try:
-        if num_days > 0:
-                # Wait for user to input forecast lookback
-            while st.button('Forecast') == False:
-                 pass
-        for i in range(numdays*24):
-            prediction = model.predict(np.array([last_x]))
-            future_data.append(prediction[0])
-            last_x = np.concatenate((last_x[1:], prediction), axis=0)
-    except NameError:
-        print("Please enter number of days")
+
+    for i in range(numdays*24):
+        prediction = model.predict(np.array([last_x]))
+        future_data.append(prediction[0])
+        last_x = np.concatenate((last_x[1:], prediction), axis=0)
     future_data = np.array(future_data)
     future_data = scaler.inverse_transform(future_data)
     return future_data
@@ -72,7 +65,11 @@ def main():
         df = pd.read_csv(uploaded_file)
         df['time_interval'] = pd.to_datetime(df['time_interval'])
         df.set_index('time_interval', inplace=True)
-
+        num_days = st.number_input('Enter the number of day/s to forecast:', min_value=0, max_value=31, value=0, step=1) # Number of previous days to use for prediction
+        if num_days > 0:
+            # Wait for user to input forecast lookback
+            while st.button('Forecast') == False:
+                 pass
         X, y, scaler = preprocess_data(df)
         model = build_model(X, y)
 
