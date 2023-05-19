@@ -46,7 +46,7 @@ def build_model(X, y):
 # Function to forecast data
 def forecast_data(model, last_x, scaler , num_days):
     future_data = []
-    for i in range(num_days*24):
+    for i in range(24*7):
         prediction = model.predict(np.array([last_x]))
         future_data.append(prediction[0])
         last_x = np.concatenate((last_x[1:], prediction), axis=0)
@@ -64,32 +64,28 @@ def main():
         df = pd.read_csv(uploaded_file)
         df['time_interval'] = pd.to_datetime(df['time_interval'])
         df.set_index('time_interval', inplace=True)
-        num_days = st.number_input('Enter the number of day/s to forecast:') # Number of previous days to use for prediction
-        if num_days > 0:
-            num_days =  st.button('Forecast',key='num_days')
-            if num_days:
 
-                X, y, scaler = preprocess_data(df)
-                model = build_model(X, y)
+        X, y, scaler = preprocess_data(df)
+        model = build_model(X, y)
 
-                # Forecast data for 1 day
-                last_x = X[-1]
-                future_data = forecast_data(model, last_x, scaler, num_days)
-                forecast_timestamps = pd.date_range(start=df.index[-1], periods=len(future_data) + 1, freq='H')[1:]
+        # Forecast data for 1 day
+        last_x = X[-1]
+        future_data = forecast_data(model, last_x, scaler)
+        forecast_timestamps = pd.date_range(start=df.index[-1], periods=len(future_data) + 1, freq='H')[1:]
 
-                # Create DataFrame for forecasted data
-                forecast_df = pd.DataFrame({'Delivery Interval': forecast_timestamps, 'Forecasted Value': future_data[:, 0]})
-                forecast_df.set_index('Delivery Interval', inplace=True)
+        # Create DataFrame for forecasted data
+        forecast_df = pd.DataFrame({'Delivery Interval': forecast_timestamps, 'Forecasted Value': future_data[:, 0]})
+        forecast_df.set_index('Delivery Interval', inplace=True)
 
-                # Display forecasted data
-                st.subheader('Forecasted Data')
-                st.write(forecast_df)
+        # Display forecasted data
+        st.subheader('Forecasted Data')
+        st.write(forecast_df)
 
-                # Plot forecasted data
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(x=forecast_timestamps, y=future_data[:, 0], name='Forecasted Data'))
-                fig.update_layout(title='1-Day Forecast using LSTM', xaxis_title='Delivery Interval', yaxis_title='Average LMP')
-                st.plotly_chart(fig)
+        # Plot forecasted data
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=forecast_timestamps, y=future_data[:, 0], name='Forecasted Data'))
+        fig.update_layout(title='1-Day Forecast using LSTM', xaxis_title='Delivery Interval', yaxis_title='Average LMP')
+        st.plotly_chart(fig)
 
 if __name__ == '__main__':
     main()
