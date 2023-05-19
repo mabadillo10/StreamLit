@@ -64,7 +64,7 @@ def main():
         df = pd.read_csv(uploaded_file)
         df['time_interval'] = pd.to_datetime(df['time_interval'])
         df.set_index('time_interval', inplace=True)
-        num_days = st.number_input('Enter the number of day/s to forecast:', min_value=0, max_value=31, value=0, step=1) # Number of previous days to use for prediction
+        num_days = st.number_input('Enter the number of day/s to forecast:') # Number of previous days to use for prediction
         if num_days > 0:
             num_days =  st.button('Forecast',key='num_days')
             if num_days:
