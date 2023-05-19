@@ -46,7 +46,6 @@ def build_model(X, y):
 # Function to forecast data
 def forecast_data(model, last_x, scaler , num_days):
     future_data = []
-
     for i in range(num_days*24):
         prediction = model.predict(np.array([last_x]))
         future_data.append(prediction[0])
@@ -75,7 +74,7 @@ def main():
 
                 # Forecast data for 1 day
                 last_x = X[-1]
-                future_data = forecast_data(model, last_x, scaler)
+                future_data = forecast_data(model, last_x, scaler, num_days)
                 forecast_timestamps = pd.date_range(start=df.index[-1], periods=len(future_data) + 1, freq='H')[1:]
 
                 # Create DataFrame for forecasted data
