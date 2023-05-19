@@ -18,7 +18,10 @@ def preprocess_data(df):
     # Prepare the data for LSTM model
     # User input for forecasting steps
     lookback = st.number_input('Enter the number lookback hours to forecast:', min_value=1, max_value=10000, value=1, step=1) # Number of previous hours to use for prediction
-
+    if lookback > 0:
+            # Wait for user to input forecast lookback
+        while st.button('Confirm') == False:
+            pass    
     X = []
     y = []
     for i in range(lookback, len(scaled_data)):
@@ -73,10 +76,7 @@ def main():
 
         X, y, scaler = preprocess_data(df)
         model = build_model(X, y)
-        if lookback > 0:
-            # Wait for user to input forecast lookback
-            while st.button('Confirm') == False:
-                pass
+
         # Forecast data for 1 day
         last_x = X[-1]
         future_data = forecast_data(model, last_x, scaler)
