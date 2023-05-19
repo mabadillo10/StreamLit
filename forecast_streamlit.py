@@ -40,7 +40,7 @@ def build_model(X, y):
     model.add(LSTM(units=50))
     model.add(Dense(units=1))
     model.compile(optimizer='adam', loss='mean_squared_error')
-    model.fit(X, y, epochs=10, batch_size=32)
+    model.fit(X, y, epochs=2, batch_size=32)
     return model
 
 # Function to forecast data
