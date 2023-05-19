@@ -18,7 +18,7 @@ def preprocess_data(df):
     # Prepare the data for LSTM model
     # User input for forecasting steps
    
-
+    lookback = 8760
     X = []
     y = []
     for i in range(lookback, len(scaled_data)):
