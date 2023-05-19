@@ -44,7 +44,7 @@ def build_model(X, y):
     return model
 
 # Function to forecast data
-def forecast_data(model, last_x, scaler):
+def forecast_data(model, last_x, scaler , num_days):
     future_data = []
 
     for i in range(num_days*24):
