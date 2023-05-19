@@ -47,13 +47,13 @@ def build_model(X, y):
 def forecast_data(model, last_x, scaler , num_days):
     future_data = []
     
-            for i in range(num_days*24):
-                prediction = model.predict(np.array([last_x]))
-                future_data.append(prediction[0])
-                last_x = np.concatenate((last_x[1:], prediction), axis=0)
+    for i in range(num_days*24):
+         prediction = model.predict(np.array([last_x]))
+         future_data.append(prediction[0])
+         last_x = np.concatenate((last_x[1:], prediction), axis=0)
 
-            future_data = np.array(future_data)
-            future_data = scaler.inverse_transform(future_data)
+         future_data = np.array(future_data)
+         future_data = scaler.inverse_transform(future_data)
     return future_data
 
 # Streamlit app
