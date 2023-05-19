@@ -34,7 +34,7 @@ def preprocess_data(df):
             # Reshape X for LSTM input shape (samples, time steps, features)
             X = np.reshape(X, (X.shape[0], X.shape[1], 1))
 
-            return X, y, scaler
+    return X, y, scaler
 
 # Function to build and train the LSTM model
 def build_model(X, y):
@@ -61,7 +61,7 @@ def forecast_data(model, last_x, scaler):
 
             future_data = np.array(future_data)
             future_data = scaler.inverse_transform(future_data)
-            return future_data
+    return future_data
 
 # Streamlit app
 def main():
