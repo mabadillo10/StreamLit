@@ -52,7 +52,7 @@ def build_lstm_model(X, y):
     model.add(LSTM(units=50))
     model.add(Dense(units=1))
     model.compile(optimizer='adam', loss='mean_squared_error')
-    model.fit(X, y, epochs=50, batch_size=32)
+    model.fit(X, y, epochs=15, batch_size=32)
     return model
 
 # Function to build and train the SARIMA model
