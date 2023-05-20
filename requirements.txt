@@ -7,5 +7,4 @@ matplotlib
 tensorflow
 plotly
 pmdarima
-tensorrt
 numpy
